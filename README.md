@@ -220,6 +220,9 @@ This project is maintained by me alone. The project will always remain free and 
 
 [Paypal](https://paypal.me/mifino/usd) | [crypto](https://mifi.no/thanks)
 
+## TODO's
+-
+
 ## Articles
 
 - [Featured in the Console newsletter](https://console.substack.com/p/console-93)
