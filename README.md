@@ -102,8 +102,8 @@ If you want to support my continued work on LosslessCut, and you want the advant
 If you prefer to download the executables manually, this will of course always be free:
 
 - Mac OS X: [DMG](https://github.com/mifi/lossless-cut/releases/latest/download/LosslessCut-mac-x64.dmg)
-- Window: [EXE](https://github.com/mifi/lossless-cut/releases/latest/download/LosslessCut-win-x64.exe) (portable/self-extracting) / [ZIP](https://github.com/mifi/lossless-cut/releases/latest/download/LosslessCut-win-x64.zip) (portable)
-- Linux: [x64 tar.bz2](https://github.com/mifi/lossless-cut/releases/latest/download/LosslessCut-linux-x64.tar.bz2) / [x64 AppImage](https://github.com/mifi/lossless-cut/releases/latest/download/LosslessCut-linux-x86_64.AppImage) / [arm64 tar.bz2](https://github.com/mifi/lossless-cut/releases/latest/download/LosslessCut-linux-arm64.tar.bz2)
+- Windows: [7zip](https://github.com/mifi/lossless-cut/releases/latest/download/LosslessCut-win-x64.7z) (APPX not available)
+- Linux: [x64 tar.bz2](https://github.com/mifi/lossless-cut/releases/latest/download/LosslessCut-linux-x64.tar.bz2) / [x64 AppImage](https://github.com/mifi/lossless-cut/releases/latest/download/LosslessCut-linux-x86_64.AppImage) / [arm64 tar.bz2](https://github.com/mifi/lossless-cut/releases/latest/download/LosslessCut-linux-arm64.tar.bz2) / [Raspberry Pi armv7l](https://github.com/mifi/lossless-cut/releases/latest/download/LosslessCut-linux-armv7l.tar.bz2)
 - [More releases](https://github.com/mifi/lossless-cut/releases)
 
 If you find LosslessCut useful, I'm very thankful for [donations](https://github.com/mifi/lossless-cut#donate-).
@@ -158,6 +158,7 @@ Unsupported files can still be converted to a supported format/codec from the `F
   - Your mileage may vary when it comes to `Keyframe cut` vs `Normal cut`. You may need to try both, depending on the video. [ffmpeg](https://trac.ffmpeg.org/wiki/Seeking) also has documentation about these two seek/cut modes. `Keyframe cut` means `-ss` *before* `-i` and `Normal cut` means `-ss` *after* `-i`.
   - You may try to enable the new "Smart cut" mode. However it is very experimental and may not work for most files.
 - When exporting you may lose some proprietary data tracks (like `tmcd`, `fdsc` and `gpmd` added by GoPro). These can however be losslessly exported to separate files.
+- If you cut a file, but the duration of the exported file is incorrect (or the same as input), try to disable all tracks except for the video track.
 - EXIF/metadata can be preserved (see Export Options dialog), but it doesn't always output compliant files, so use it carefully.
 - Some codecs are not natively supported, but will preview with low quality playback and no audio. You may convert these files to a supported codec from the File menu, see [#88](https://github.com/mifi/lossless-cut/issues/88).
 
@@ -165,16 +166,18 @@ Unsupported files can still be converted to a supported format/codec from the `F
 
 - **Can LosslessCut crop, resize, stretch, mirror, overlay text/images, watermark, blur, redact, re-encode, speed-up/slow-down, create GIF, slideshow, burn subtitles, color grading, fade/combine/mix audio tracks?**
   - [No, these are all lossy operations, but in the future I may start to implement such features](https://github.com/mifi/lossless-cut/issues/372).
-- MPEG TS files have a tendency to be a bit problematic. It may help to **first** remux them to another format like MP4/MKV. Then you can open the MP4/MKV file an work on that.
+- **MPEG TS** files have a tendency to be a bit problematic. It may help to **first** remux them to another format like MP4/MKV. Then you can open the MP4/MKV file an work on that.
+- Can LosslessCut be batched/automated using a CLI or API?
+  - No, it was never designed for that. However there are a few feature requests regarding this: [#980](https://github.com/mifi/lossless-cut/issues/980) [#868](https://github.com/mifi/lossless-cut/issues/868)
 - **Linux**: If you get an error like `FATAL:setuid_sandbox_host.cc(157)] The SUID sandbox helper binary was found, but is not configured correctly. Rather than run without sandboxing I'm aborting now.`, try to run it as `./lossless-cut --no-sandbox`. See [#258](https://github.com/mifi/lossless-cut/issues/258)
 
 ### Windows issues
 
-- What's the difference between `.exe` and `.zip` downloads? `.exe` will self-extract on startup to a temp folder and is therefore slower to start up. `.zip` must be extracted manually but is very fast to start up.
-- If you get an error when cutting or opening any kind of file, try to disable your anti-virus. See [#18](https://github.com/mifi/lossless-cut/issues/18)
-- How to uninstall LosslessCut? There is no installer. Just delete the EXE file or containing folder. User files are stored in your [appData](https://www.electronjs.org/docs/api/app#appgetpathname) folder.
-- If the app crashes immediately upon startup, check the permissions of your User and Temp folders, see [61](https://github.com/mifi/lossless-cut/issues/61).
+- If you get an error immediately when starting up LosslessCut, try to disable your anti-virus or whitelist LosslessCut. See [#18](https://github.com/mifi/lossless-cut/issues/18) [#1114](https://github.com/mifi/lossless-cut/issues/1114)
+- How to uninstall LosslessCut? There is no installer. Just delete the folder. Settings and temp files are stored in your [appData](https://www.electronjs.org/docs/api/app#appgetpathname) folder.
 - Completely white window when starting up? Try to run with `--disable-gpu` - See [781](https://github.com/mifi/lossless-cut/issues/781).
+- Where did the `.exe`/`.zip` downloads go? I decided to stop distributing exe and instead just 7zip, due to the [problems that the exe download was causing and the large size of zips.](https://github.com/mifi/lossless-cut/issues/1072#issuecomment-1066026323)
+- [APPX is not signed and **does not work**.](https://github.com/mifi/lossless-cut/issues/337) Please use [7z package](https://github.com/mifi/lossless-cut/releases/latest/download/LosslessCut-win-x64.7z) instead.
 
 If any other problem, check [Known issues](#known-issues--limitations), or please search for existing issues before you file an issue here on GitHub. You can check the developer tools for any errors or clues. Menu: `Tools` -> `Toggle Developer Tools`.
 Also you are welcome to hang out on [Discord](https://discord.gg/fhnEREfUJ3) ðŸ¤—
@@ -194,7 +197,7 @@ Also you are welcome to hang out on [Discord](https://discord.gg/fhnEREfUJ3) ðŸ¤
 
 ## Command line interface (CLI)
 
-Note that these exampels assume that you have set up LosslessCut in your `PATH` environment. Alternatively you can run it like this:
+LosslessCut only has limited support for automation through the CLI. Note that these examples assume that you have set up LosslessCut in your `PATH` environment. Alternatively you can run it like this:
 ```
 # First navigate to the folder containing the LosslessCut app
 cd /path/to/directory/containing/app

@@ -56,6 +56,7 @@ import {
   extractStreams, runStartupCheck, setCustomFfPath as ffmpegSetCustomFfPath,
   isIphoneHevc, tryMapChaptersToEdl, blackDetect,
   getDuration, getTimecodeFromStreams, createChaptersFromSegments, extractSubtitleTrack,
+  getFfmpegPath,
 } from './ffmpeg';
 import { shouldCopyStreamByDefault, getAudioStreams, getRealVideoStreams, defaultProcessedCodecTypes, isAudioDefinitelyNotSupported, doesPlayerSupportFile } from './util/streams';
 import { exportEdlFile, readEdlFile, saveLlcProject, loadLlcProject, askForEdlImport } from './edlStore';
@@ -1242,7 +1243,7 @@ const App = memo(() => {
     const state = {
       filePath,
       fileFormat,
-      setExternalFilesMeta,
+      externalFilesMeta,
       mainStreams,
       copyStreamIdsByFile,
       cutSegments: cutSegments.map(s => ({ start: s.start, end: s.end })),
@@ -1253,7 +1254,7 @@ const App = memo(() => {
     };
 
     openSendReportDialog(err, state);
-  }, [filePath, fileFormat, mainStreams, copyStreamIdsByFile, cutSegments, mainFileFormatData, rotation, shortestFlag, effectiveExportMode]);
+  }, [filePath, fileFormat, externalFilesMeta, mainStreams, copyStreamIdsByFile, cutSegments, mainFileFormatData, rotation, shortestFlag, effectiveExportMode]);
 
   const handleCutFailed = useCallback(async (err) => {
     const sendErrorReport = await showCutFailedDialog({ detectedFileFormat });
@@ -2067,7 +2068,7 @@ const App = memo(() => {
       setWorking(i18n.t('Loading file'));
 
       // Import segments for for already opened file
-      const edlFormats = { csv: 'csv', pbf: 'pbf', edl: 'mplayer', cue: 'cue', xml: 'xmeml' };
+      const edlFormats = { csv: 'csv', pbf: 'pbf', edl: 'mplayer', cue: 'cue', xml: 'xmeml', fcpxml: 'fcpxml' };
       const matchingExt = Object.keys(edlFormats).find((ext) => filePathLowerCase.endsWith(`.${ext}`));
       if (matchingExt) {
         if (!checkFileOpened()) return;
@@ -2272,7 +2273,24 @@ const App = memo(() => {
 
   const haveCustomFfPath = !!customFfPath;
   useEffect(() => {
-    if (!haveCustomFfPath) runStartupCheck().catch((err) => handleError('LosslessCut is installation is broken', err));
+    if (!haveCustomFfPath) {
+      (async () => {
+        try {
+          await runStartupCheck();
+        } catch (err) {
+          if (['EPERM', 'EACCES'].includes(err.code)) {
+            toast.fire({
+              timer: 30000,
+              icon: 'error',
+              title: 'Fatal: ffmpeg not accessible',
+              text: `Got ${err.code}. This probably means that anti-virus is blocking execution of ffmpeg. Please make sure the following file exists and is executable:\n\n${getFfmpegPath()}\n\nSee this issue: https://github.com/mifi/lossless-cut/issues/1114`,
+            });
+            return;
+          }
+          handleError('Fatal: ffmpeg non-functional', err);
+        }
+      })();
+    }
   }, [haveCustomFfPath]);
 
   useEffect(() => {
